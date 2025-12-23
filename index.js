@@ -5,35 +5,27 @@ import dotenv from "dotenv";
 
 import authRoutes from "./routes/auth.routes.js";
 import groupRoutes from "./routes/group.routes.js";
+import expenseRoutes from "./routes/expense.routes.js";
 
 dotenv.config();
 
 const app = express();
 
-// ✅ MIDDLEWARE
+app.use(cors());
 app.use(express.json());
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
 
-// ✅ TEST ROUTE (VERY IMPORTANT)
-app.get("/", (req, res) => {
-  res.send("Backend is running");
-});
-
-// ✅ ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/expenses", expenseRoutes);
 
-// ❌ TEMP: COMMENT MONGODB (to avoid timeout today)
-/*
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error(err));
-*/
+  .catch(err => console.log(err));
+
+app.get("/", (req, res) => {
+  res.send("API running");
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
