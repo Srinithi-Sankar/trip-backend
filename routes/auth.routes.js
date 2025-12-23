@@ -1,49 +1,22 @@
-const router = require("express").Router();
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+import express from "express";
+const router = express.Router();
 
-// Register
+// ✅ TEMP REGISTER
 router.post("/register", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      name,
-      email,
-      password: hashed
-    });
-
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  res.json({
+    message: "User registered (TEMP)",
+    user: req.body
+  });
 });
 
-// Login
+// ✅ TEMP LOGIN (NO DB)
 router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ message: "User not found" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Wrong password" });
-
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.json({ token, user });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  res.json({
+    token: "test-token",
+    user: {
+      email: req.body.email
+    }
+  });
 });
 
-module.exports = router;
+export default router;
