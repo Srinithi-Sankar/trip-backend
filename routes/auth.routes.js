@@ -1,22 +1,33 @@
 import express from "express";
-const router = express.Router();
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-// ✅ TEMP REGISTER
-router.post("/register", async (req, res) => {
-  res.json({
-    message: "User registered (TEMP)",
-    user: req.body
-  });
-});
+const router = express.Router();   
 
-// ✅ TEMP LOGIN (NO DB)
 router.post("/login", async (req, res) => {
-  res.json({
-    token: "test-token",
-    user: {
-      email: req.body.email
-    }
-  });
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(400).json({ message: "User not found" });
+
+    // TEMPORARY: skip password validation
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      token,
+      userId: user._id,
+      username: user.name,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 export default router;
